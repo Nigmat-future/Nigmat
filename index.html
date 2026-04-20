@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Nigmat Rahim — Bioinformatics & AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..800&family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #f4f1ea;
+    --bg-tint: #ebe6db;
+    --paper: #faf8f2;
+    --ink: #1a1814;
+    --ink-soft: #4a453d;
+    --ink-mute: #7a7268;
+    --rule: #d9d3c4;
+    --rule-soft: #e6e1d2;
+    --accent: #8a2c1b;      /* oxblood */
+    --accent-soft: #b86a54;
+    --mark: #d9b36a;
+    --ok: #3d6b3a;
+    --serif: "Newsreader", "Iowan Old Style", "Palatino", Georgia, serif;
+    --display: "Fraunces", "Newsreader", Georgia, serif;
+    --mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+    --sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  }
+  [data-theme="dark"]{
+    --bg:#0e110f; --bg-tint:#14181a; --paper:#161a18; --ink:#eae4d6; --ink-soft:#c2bdad;
+    --ink-mute:#857e70; --rule:#2a2d28; --rule-soft:#1e211d; --accent:#e08c70; --accent-soft:#b86a54; --mark:#d9b36a;
+  }
+  [data-theme="terminal"]{
+    --bg:#0a0e0b; --bg-tint:#0d1110; --paper:#0f1412; --ink:#d6e4d4; --ink-soft:#9db39a;
+    --ink-mute:#5e7a5d; --rule:#1e2a1f; --rule-soft:#14201a; --accent:#7fe3b0; --accent-soft:#51b98a; --mark:#d9b36a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{min-height:100vh; transition: background .35s ease, color .35s ease;}
+  a{color:inherit}
+  ::selection{background:var(--mark);color:#1a1814}
+  /* Layout shell */
+  .shell{max-width:1180px;margin:0 auto;padding:0 40px}
+  @media (max-width:720px){.shell{padding:0 20px}}
+
+  /* ——— Top bar ——— */
+  .topbar{position:sticky;top:0;z-index:50;background:color-mix(in srgb, var(--bg) 88%, transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--rule-soft)}
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:12px;font-family:var(--display);font-weight:500;font-variation-settings:"opsz" 12,"SOFT" 50;font-size:19px;letter-spacing:-0.01em}
+  .brand-dot{width:10px;height:10px;background:var(--accent);border-radius:50%;box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent)}
+  .brand small{font-family:var(--mono);font-size:11px;color:var(--ink-mute);letter-spacing:0.04em;text-transform:uppercase;font-weight:400;margin-left:6px}
+  .nav{display:flex;gap:2px;align-items:center}
+  .nav a{font-family:var(--sans);font-size:13.5px;color:var(--ink-soft);text-decoration:none;padding:8px 12px;border-radius:6px;transition:all .15s ease;letter-spacing:-0.005em}
+  .nav a:hover{color:var(--ink);background:var(--bg-tint)}
+  .nav a.active{color:var(--ink);background:var(--bg-tint)}
+  .kbd{font-family:var(--mono);font-size:10.5px;padding:3px 7px;border:1px solid var(--rule);border-radius:5px;color:var(--ink-mute);background:var(--paper);letter-spacing:0.02em}
+  .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);border-radius:8px;cursor:pointer;transition:all .15s}
+  .icon-btn:hover{color:var(--ink);border-color:var(--ink-mute)}
+  .topbar-tools{display:flex;align-items:center;gap:10px}
+  .cmdk-btn{display:inline-flex;align-items:center;gap:10px;padding:7px 10px 7px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--paper);color:var(--ink-mute);font-family:var(--sans);font-size:12.5px;cursor:pointer;transition:all .15s}
+  .cmdk-btn:hover{border-color:var(--ink-mute);color:var(--ink-soft)}
+  .cmdk-btn .k{display:flex;gap:3px}
+  @media (max-width:820px){.nav a{padding:6px 8px;font-size:12.5px} .cmdk-btn .lbl{display:none}}
+  @media (max-width:640px){.nav a{display:none} .brand small{display:none}}
+
+  /* ——— Hero ——— */
+  .hero{padding:80px 0 72px;position:relative;overflow:hidden}
+  .hero-meta{font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:0.12em;text-transform:uppercase;display:flex;align-items:center;gap:14px;margin-bottom:28px}
+  .hero-meta .rule{flex:0 0 48px;height:1px;background:var(--ink-mute);opacity:.55}
+  .hero h1{font-family:var(--display);font-weight:320;font-variation-settings:"opsz" 144,"SOFT" 0,"WONK" 0;font-size:clamp(52px, 9vw, 112px);line-height:0.94;letter-spacing:-0.03em;margin:0 0 26px;color:var(--ink)}
+  .hero h1 em{font-style:italic;font-variation-settings:"opsz" 144,"SOFT" 100,"WONK" 1;color:var(--accent);font-weight:360}
+  .hero-lede{font-family:var(--serif);font-size:clamp(19px, 2vw, 22px);line-height:1.55;color:var(--ink-soft);max-width:640px;margin:0 0 38px;font-weight:380}
+  .hero-lede b{color:var(--ink);font-weight:520}
+  .hero-stats{display:flex;flex-wrap:wrap;gap:44px;padding-top:30px;border-top:1px solid var(--rule)}
+  .hero-stat .num{font-family:var(--display);font-weight:360;font-size:34px;color:var(--ink);font-variation-settings:"opsz" 48,"SOFT" 30;line-height:1;letter-spacing:-0.02em}
+  .hero-stat .num .unit{font-family:var(--sans);font-size:13px;color:var(--ink-mute);font-weight:500;margin-left:4px;letter-spacing:0}
+  .hero-stat .lbl{font-family:var(--mono);font-size:10.5px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.1em;margin-top:8px}
+
+  /* Hero art — cellular dots */
+  .hero-art{position:absolute;right:-60px;top:50%;transform:translateY(-50%);width:520px;height:520px;pointer-events:none;opacity:.85;mix-blend-mode: multiply}
+  [data-theme="dark"] .hero-art, [data-theme="terminal"] .hero-art{mix-blend-mode:screen;opacity:.6}
+  @media (max-width:1080px){.hero-art{opacity:.22;right:-140px}}
+  @media (max-width:720px){.hero-art{display:none}}
+
+  /* ——— Section chrome ——— */
+  section{padding:88px 0;border-top:1px solid var(--rule-soft)}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:44px;gap:24px;flex-wrap:wrap}
+  .sec-title{font-family:var(--display);font-weight:360;font-variation-settings:"opsz" 48;font-size:clamp(34px,4.5vw,52px);line-height:1;letter-spacing:-0.025em;color:var(--ink);margin:0;display:flex;align-items:baseline;gap:18px}
+  .sec-title .num{font-family:var(--mono);font-size:12px;color:var(--ink-mute);font-weight:400;letter-spacing:0.1em;text-transform:uppercase;align-self:flex-start;margin-top:10px}
+  .sec-sub{font-family:var(--sans);font-size:13px;color:var(--ink-mute);letter-spacing:0.01em;max-width:360px}
+
+  /* ——— About ——— */
+  .about-grid{display:grid;grid-template-columns: 1fr 1.3fr;gap:64px;align-items:start}
+  @media (max-width:880px){.about-grid{grid-template-columns:1fr;gap:40px}}
+  .portrait{aspect-ratio:4/5;background:var(--paper);border:1px solid var(--rule);position:relative;overflow:hidden}
+  .portrait-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:
+    repeating-linear-gradient(135deg, transparent 0 14px, color-mix(in srgb, var(--ink) 3%, transparent) 14px 15px);}
+  .portrait-placeholder .mono{font-family:var(--mono);font-size:10.5px;color:var(--ink-mute);letter-spacing:0.12em;text-transform:uppercase}
+  .portrait-meta{position:absolute;bottom:14px;left:14px;right:14px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--ink-mute);letter-spacing:0.08em;text-transform:uppercase}
+  .about-body p{font-size:18px;line-height:1.65;color:var(--ink-soft);margin:0 0 18px;max-width:56ch}
+  .about-body p:first-child::first-letter{font-family:var(--display);font-size:68px;float:left;line-height:0.9;margin:6px 10px -2px 0;color:var(--accent);font-weight:360;font-variation-settings:"opsz" 144,"SOFT" 50}
+  .about-body b{color:var(--ink);font-weight:520}
+  .facts{margin-top:36px;display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:var(--rule-soft);border:1px solid var(--rule-soft)}
+  .fact{background:var(--bg);padding:18px 22px}
+  .fact .k{font-family:var(--mono);font-size:10.5px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+  .fact .v{font-family:var(--serif);font-size:16px;color:var(--ink);line-height:1.35}
+  .fact .v em{font-style:italic;color:var(--accent-soft)}
+
+  /* ——— Publications ——— */
+  .pubs-head{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .chip{font-family:var(--mono);font-size:11px;padding:5px 10px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);border-radius:999px;cursor:pointer;letter-spacing:0.02em;transition:all .15s}
+  .chip:hover{border-color:var(--ink-mute);color:var(--ink)}
+  .chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .pub{display:grid;grid-template-columns: 110px 1fr auto; gap:28px; padding:26px 0; border-top:1px solid var(--rule-soft); align-items:start}
+  .pub:last-child{border-bottom:1px solid var(--rule-soft)}
+  .pub-year{font-family:var(--mono);font-size:13px;color:var(--ink-mute);letter-spacing:0.04em;padding-top:4px}
+  .pub-year .st{display:block;margin-top:6px;font-size:10.5px;padding:2px 7px;border:1px solid var(--rule);border-radius:999px;width:max-content;color:var(--ink-soft);letter-spacing:0.06em;text-transform:uppercase}
+  .pub-year .st.review{color:var(--accent)}
+  .pub-year .st.accepted{color:var(--ok)}
+  .pub-title{font-family:var(--display);font-weight:400;font-variation-settings:"opsz" 24;font-size:22px;line-height:1.25;letter-spacing:-0.015em;color:var(--ink);margin:0 0 8px;max-width:52ch}
+  .pub-authors{font-family:var(--serif);font-size:14.5px;line-height:1.55;color:var(--ink-soft)}
+  .pub-authors .me{color:var(--accent);font-weight:520;background:color-mix(in srgb, var(--accent) 8%, transparent);padding:0 3px;border-radius:2px}
+  .pub-authors .co{font-family:var(--mono);font-size:10.5px;color:var(--ink-mute);vertical-align:super;margin-left:1px}
+  .pub-venue{margin-top:10px;font-family:var(--sans);font-size:12.5px;color:var(--ink-mute);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .pub-venue em{font-family:var(--serif);font-style:italic;color:var(--ink-soft);font-size:14px}
+  .pub-actions{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+  .pub-actions button{font-family:var(--mono);font-size:11px;padding:6px 10px;background:var(--paper);border:1px solid var(--rule);color:var(--ink-soft);cursor:pointer;border-radius:6px;text-transform:uppercase;letter-spacing:0.06em;transition:all .15s}
+  .pub-actions button:hover{color:var(--ink);border-color:var(--ink-mute)}
+  .pub-actions button.copied{color:var(--ok);border-color:var(--ok)}
+  @media (max-width:720px){.pub{grid-template-columns:1fr;gap:10px} .pub-actions{flex-direction:row}}
+
+  /* ——— Research projects ——— */
+  .research-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:32px 28px}
+  .rp{grid-column:span 6;background:var(--paper);border:1px solid var(--rule);padding:32px;position:relative;transition:all .2s ease}
+  .rp:hover{border-color:var(--ink-mute);transform:translateY(-2px)}
+  .rp.feature{grid-column:span 12;padding:42px;background:linear-gradient(135deg, var(--paper) 0%, color-mix(in srgb, var(--accent) 4%, var(--paper)) 100%)}
+  @media (max-width:880px){.rp,.rp.feature{grid-column:span 12;padding:26px}}
+  .rp-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;font-family:var(--mono);font-size:11px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.1em}
+  .rp-meta .tag{padding:3px 8px;border:1px solid var(--rule);border-radius:999px}
+  .rp h3{font-family:var(--display);font-weight:380;font-variation-settings:"opsz" 36;font-size:28px;line-height:1.15;letter-spacing:-0.02em;margin:0 0 12px;color:var(--ink)}
+  .rp.feature h3{font-size:40px;font-weight:350;max-width:20ch}
+  .rp p{font-size:15.5px;line-height:1.6;color:var(--ink-soft);margin:0 0 20px;max-width:58ch}
+  .rp-stats{display:flex;gap:28px;flex-wrap:wrap;padding-top:18px;border-top:1px dashed var(--rule)}
+  .rp-stat .n{font-family:var(--display);font-weight:420;font-variation-settings:"opsz" 36;font-size:22px;color:var(--ink);line-height:1;letter-spacing:-0.015em}
+  .rp-stat .n .u{font-family:var(--sans);font-size:11px;color:var(--ink-mute);font-weight:500;margin-left:3px}
+  .rp-stat .l{font-family:var(--mono);font-size:10px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.08em;margin-top:4px}
+  .rp-tech{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}
+  .rp-tech span{font-family:var(--mono);font-size:10.5px;color:var(--ink-mute);padding:2px 7px;background:var(--bg-tint);border-radius:3px;letter-spacing:0.02em}
+
+  /* ——— OSS / GitHub projects ——— */
+  .oss-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media (max-width:980px){.oss-grid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:640px){.oss-grid{grid-template-columns:1fr}}
+  .oss{background:var(--paper);border:1px solid var(--rule);padding:22px;display:flex;flex-direction:column;gap:12px;transition:all .2s ease;text-decoration:none;color:inherit;cursor:pointer}
+  .oss:hover{border-color:var(--ink);transform:translateY(-2px)}
+  .oss-top{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-mute)}
+  .oss-top .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle}
+  .oss-name{font-family:var(--display);font-weight:420;font-size:19px;line-height:1.2;color:var(--ink);margin:0;letter-spacing:-0.01em}
+  .oss-desc{font-size:14px;line-height:1.5;color:var(--ink-soft);flex:1;margin:0}
+  .oss-arr{font-family:var(--mono);color:var(--ink-mute);font-size:13px;align-self:flex-end;transition:transform .2s, color .2s}
+  .oss:hover .oss-arr{color:var(--accent);transform:translate(3px,-3px)}
+
+  /* ——— Writing ——— */
+  .posts{display:flex;flex-direction:column}
+  .post{display:grid;grid-template-columns:160px 1fr 120px;gap:32px;padding:28px 0;border-top:1px solid var(--rule-soft);align-items:center;text-decoration:none;color:inherit;transition:padding .2s}
+  .post:hover{padding-left:10px}
+  .post:last-child{border-bottom:1px solid var(--rule-soft)}
+  .post-date{font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:0.04em;text-transform:uppercase}
+  .post-title{font-family:var(--display);font-weight:380;font-size:22px;line-height:1.25;letter-spacing:-0.015em;color:var(--ink);margin:0}
+  .post-title em{font-style:italic;color:var(--accent)}
+  .post-tag{font-family:var(--mono);font-size:10.5px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.08em;text-align:right}
+  @media (max-width:720px){.post{grid-template-columns:1fr;gap:6px} .post-tag{text-align:left}}
+
+  /* ——— Now / Contact ——— */
+  .now-contact{display:grid;grid-template-columns:1.2fr 1fr;gap:56px}
+  @media (max-width:880px){.now-contact{grid-template-columns:1fr;gap:40px}}
+  .now-list{display:flex;flex-direction:column;gap:14px;margin-top:18px}
+  .now-item{display:flex;gap:14px;align-items:flex-start;font-size:16px;line-height:1.55;color:var(--ink-soft)}
+  .now-item .b{width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:9px;flex-shrink:0;box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent)}
+  .now-item b{color:var(--ink);font-weight:520}
+  .contact-card{background:var(--paper);border:1px solid var(--rule);padding:32px}
+  .contact-card h4{font-family:var(--display);font-weight:380;font-size:24px;margin:0 0 14px;letter-spacing:-0.01em}
+  .contact-list{display:flex;flex-direction:column;gap:12px;margin-top:18px}
+  .contact-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px dashed var(--rule)}
+  .contact-row .k{font-family:var(--mono);font-size:11px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.1em}
+  .contact-row a{font-family:var(--serif);font-size:15.5px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule)}
+  .contact-row a:hover{border-bottom-color:var(--accent);color:var(--accent)}
+
+  /* ——— Footer ——— */
+  footer{padding:48px 0 64px;border-top:1px solid var(--rule-soft);margin-top:20px}
+  .foot{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);letter-spacing:0.04em;flex-wrap:wrap;gap:12px}
+
+  /* ——— Command palette ——— */
+  .cmdk-overlay{position:fixed;inset:0;background:color-mix(in srgb, var(--ink) 40%, transparent);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding-top:14vh;z-index:100;animation:fadeIn .12s ease}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .cmdk{width:560px;max-width:92vw;background:var(--paper);border:1px solid var(--rule);box-shadow:0 30px 80px -20px rgba(0,0,0,0.3);overflow:hidden;animation:popIn .16s ease}
+  @keyframes popIn{from{transform:translateY(-8px);opacity:.6}to{transform:translateY(0);opacity:1}}
+  .cmdk input{width:100%;padding:20px 22px;border:0;background:transparent;color:var(--ink);font-family:var(--serif);font-size:18px;border-bottom:1px solid var(--rule);outline:none}
+  .cmdk input::placeholder{color:var(--ink-mute);font-style:italic}
+  .cmdk-list{max-height:400px;overflow-y:auto;padding:6px}
+  .cmdk-row{display:flex;align-items:center;gap:14px;padding:11px 14px;border-radius:4px;cursor:pointer;font-family:var(--sans);font-size:14px;color:var(--ink-soft)}
+  .cmdk-row.on{background:var(--bg-tint);color:var(--ink)}
+  .cmdk-row .tag{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.06em}
+  .cmdk-row .ic{width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--ink-mute);background:var(--bg);border:1px solid var(--rule);border-radius:4px}
+
+  /* ——— Reading progress ——— */
+  .progress{position:fixed;top:0;left:0;height:2px;background:var(--accent);z-index:60;transition:width .08s linear}
+
+  /* ——— Tweaks panel ——— */
+  .tweaks{position:fixed;bottom:24px;right:24px;width:280px;background:var(--paper);border:1px solid var(--rule);box-shadow:0 16px 40px -8px rgba(0,0,0,0.18);z-index:90;font-family:var(--sans);font-size:12.5px}
+  .tweaks-h{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:11px;text-transform:uppercase;color:var(--ink-mute);letter-spacing:0.1em}
+  .tweaks-b{padding:14px 16px 16px;display:flex;flex-direction:column;gap:14px}
+  .tweaks-row{display:flex;flex-direction:column;gap:6px}
+  .tweaks-row label{font-family:var(--mono);font-size:10.5px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.08em}
+  .tweaks-seg{display:flex;gap:2px;background:var(--bg-tint);padding:2px;border-radius:6px}
+  .tweaks-seg button{flex:1;padding:6px 8px;border:0;background:transparent;color:var(--ink-soft);cursor:pointer;border-radius:4px;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:0.05em}
+  .tweaks-seg button.on{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,0.06)}
+  .tweaks-close{cursor:pointer;border:0;background:transparent;color:var(--ink-mute);font-family:var(--mono);font-size:14px}
+  @media (max-width:640px){.tweaks{bottom:12px;right:12px;left:12px;width:auto}}
+
+  /* Lang pill */
+  .lang-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .lang-strip span{font-family:var(--mono);font-size:10.5px;padding:4px 9px;border:1px solid var(--rule);border-radius:999px;color:var(--ink-soft);letter-spacing:0.04em}
+  .lang-strip span b{color:var(--ink);font-weight:520;margin-right:4px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="application/json" id="site-data">
+{
+  "publications": [
+    {
+      "id": "hubgpt",
+      "year": "2026",
+      "status": "Under review",
+      "title": "HubGPT: Retrieval-Augmented Identification of Hub Genes and Key Pathways",
+      "authors": [
+        ["Rahim, N.", true, true],
+        ["Chen, R.", false, true],
+        ["Yan, C.", false, true],
+        ["Wu, Z.", false, false],
+        ["Wu, C.", false, false],
+        ["Lin, Y.", false, false],
+        ["Zhang, H.", false, false],
+        ["Yu, Z.", false, false],
+        ["Tong, J.", false, false],
+        ["Jing, H.", false, false],
+        ["Zhang, W.*", false, false]
+      ],
+      "venue": "Advanced Science",
+      "note": "Co-first author",
+      "tags": ["rag", "llm", "bioinformatics"]
+    },
+    {
+      "id": "ferroptosis",
+      "year": "2026",
+      "status": "Accepted",
+      "title": "Comprehensive Multi-omics and Single-Cell Analysis Reveals Ferroptosis Signature Associated with Tumor Microenvironment Remodeling and Therapeutic Decision-Making across Pan-Cancer",
+      "authors": [
+        ["Qu, Y.", false, true],
+        ["Wei, Q.", false, true],
+        ["Wu, C.", false, true],
+        ["Rahim, N.", true, true],
+        ["Luo, J.", false, true],
+        ["Deng, J.", false, true],
+        ["et al.", false, false]
+      ],
+      "venue": "International Journal of Surgery",
+      "note": "Co-first author",
+      "tags": ["multi-omics", "single-cell", "ml"]
+    },
+    {
+      "id": "cd73",
+      "year": "2025",
+      "status": "Submitted",
+      "title": "CD73 Inhibitor Significantly Enhances the Antitumor Activity of Selinexor in Multiple Myeloma by Specifically Activating CD8+ T Cells",
+      "authors": [
+        ["Zhang, C.", false, true],
+        ["Wei, Q.", false, true],
+        ["Rahim, N.", true, true],
+        ["Bian, G.", false, true],
+        ["et al.", false, false]
+      ],
+      "venue": "HemaSphere",
+      "note": "Co-first author",
+      "tags": ["single-cell", "immunology"]
+    },
+    {
+      "id": "car-t",
+      "year": "2025",
+      "status": "Accepted",
+      "title": "Bispecific CAR-T vs. BCMA-Specific CAR-T: Advancing Treatment for Relapsed/Refractory Multiple Myeloma",
+      "authors": [["Rahim, N.", true, false]],
+      "venue": "FENBC 2025 (Conference)",
+      "note": "First author",
+      "tags": ["immunology", "review"]
+    }
+  ],
+  "research": [
+    {
+      "feature": true,
+      "code": "RP·01",
+      "year": "2025 — present",
+      "title": "ThyroPADA — an agentic AI system for cellular-level region-of-interest detection in thyroid FNA biopsies.",
+      "blurb": "An AI-agent diagnostic system that wires RAG over multimodal LLMs (GPT-4o/4.1) to autonomously extract and quantify 16 cytopathological features from thyroid whole-slide images — replacing manual annotation by pathologists.",
+      "stats": [
+        ["0.96", "AUC", "internal set"],
+        ["0.935–0.974", "AUC", "6 external centers"],
+        ["90.7%", "accuracy", "vs. senior pathologists"],
+        ["12,000+", "cases", "7 centers curated"]
+      ],
+      "tech": ["GPT-4o", "RAG", "Multimodal", "GBM", "7 centers"]
+    },
+    {
+      "code": "RP·02",
+      "year": "2024 — 2026",
+      "title": "HubGPT",
+      "blurb": "A RAG framework to prioritize hub genes and key pathways in cancer, addressing the false-positive rate of KEGG enrichment. Defines Pri-value and R-value metrics to distinguish oncogenic drivers from housekeeping genes across 24 cancer types.",
+      "stats": [
+        ["24", "cancers", "profiled"],
+        ["R ≈ DepMap", "", "functional validity"]
+      ],
+      "tech": ["Python", "RAG", "KEGG", "DepMap"]
+    },
+    {
+      "code": "RP·03",
+      "year": "2024 — 2025",
+      "title": "Pan-cancer ferroptosis signature (Fp.Sig)",
+      "blurb": "Integrated 10,510 TCGA samples across 33 cancer types using 10 ML algorithms to build a prognostic ferroptosis signature, then deployed it as a Shiny app for clinicians. Experimentally validated a negative correlation with SN-38 sensitivity in 5 myeloma cell lines.",
+      "stats": [
+        ["0.67", "C-index", "cross-cohort"],
+        ["0.86", "R²", "drug sensitivity"],
+        ["33", "cancers", "TCGA"]
+      ],
+      "tech": ["R", "Seurat", "Shiny", "RSF", "Enet"]
+    },
+    {
+      "code": "RP·04",
+      "year": "2023 — 2025",
+      "title": "CD73 × Selinexor combination — scRNA-seq mechanism",
+      "blurb": "Analysed scRNA-seq from a murine tumor model (J558/BALB/c) and reconstructed differentiation trajectories of 45,000+ T/NK cells with Monocle, showing the combination therapy specifically activates CD8+ T cells (↑ IFN-γ, Granzyme B, Prf1).",
+      "stats": [
+        ["45,000+", "T/NK cells", "trajectories"],
+        ["↓", "Enpp1+", "tumor subpop."]
+      ],
+      "tech": ["Seurat", "Monocle", "scRNA-seq"]
+    }
+  ],
+  "oss": [
+    {"name":"HubGPT","lang":"Python","color":"#3572A5","desc":"Retrieval-augmented identification of hub genes across 24 cancer types. Pri-value & R-value scoring.","url":"https://github.com/Nigmat-future"},
+    {"name":"cellhop","lang":"Python · R","color":"#198CE7","desc":"One-liners to hop between Python AnnData ↔ R Seurat without exposing intermediate files.","url":"https://github.com/Nigmat-future/cellhop"},
+    {"name":"Pipeline-Construction","lang":"Python","color":"#3572A5","desc":"Production-ready suite integrating state-of-the-art methods for single-cell multi-omics.","url":"https://github.com/Nigmat-future"},
+    {"name":"Gastric-Cancer-scRNA-seq","lang":"Python","color":"#3572A5","desc":"End-to-end analysis pipeline (GSE163558): batch correction, survival analysis, T-cell characterization.","url":"https://github.com/Nigmat-future/Gastric-Cancer-scRNA-seq-Analysis-Pipeline---GSE163558"},
+    {"name":"Agent-loop","lang":"Python · FastAPI","color":"#3572A5","desc":"Local agent self-learning framework with task tracing, auto-evaluation and strategy evolution.","url":"https://github.com/Nigmat-future"},
+    {"name":"scicolors","lang":"TypeScript","color":"#2b7489","desc":"Library of accessible scientific color palettes, ready-to-use in plotting and viz pipelines.","url":"https://github.com/Nigmat-future/scicolors"},
+    {"name":"rverflow","lang":"Python","color":"#3572A5","desc":"Dependency solver for R packages across CRAN/Bioconductor/GitHub. Detects version conflicts.","url":"https://github.com/Nigmat-future/rverflow"},
+    {"name":"OmniScope","lang":"TypeScript","color":"#2b7489","desc":"Data visualization platform — exploratory scope for omics-scale datasets.","url":"https://github.com/Nigmat-future"},
+    {"name":"AgenticBioAnalysis","lang":"Python","color":"#3572A5","desc":"AI-driven analysis for GEO/SRA/GDC datasets with natural-language queries.","url":"https://github.com/Nigmat-future"}
+  ],
+  "posts": [
+    {"date":"Mar 2026","title":"On tuning <em>retrieval depth</em> in RAG for genomic enrichment","tag":"RAG · notes","read":"9 min"},
+    {"date":"Feb 2026","title":"Why KEGG enrichment lies — and a scoring fix that mostly doesn't","tag":"methods","read":"12 min"},
+    {"date":"Jan 2026","title":"A small <em>taxonomy</em> of agentic AI in clinical pathology","tag":"essay","read":"7 min"},
+    {"date":"Dec 2025","title":"<em>cellhop</em>: crossing the AnnData ↔ Seurat bridge without tears","tag":"tooling","read":"6 min"},
+    {"date":"Nov 2025","title":"Notes from a 6-month rotation in the clinical lab","tag":"personal","read":"11 min"},
+    {"date":"Oct 2025","title":"How I think about co-first authorship (as an undergraduate)","tag":"research life","read":"5 min"},
+    {"date":"Aug 2025","title":"Tracing 45,000 T-cells with Monocle — what surprised me","tag":"single-cell","read":"8 min"},
+    {"date":"Jun 2025","title":"The Stanford RNA 3D folding challenge — a bronze-medal post-mortem","tag":"kaggle","read":"10 min"}
+  ]
+}
+</script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo } = React;
+
+// — Load data —
+const DATA = JSON.parse(document.getElementById('site-data').textContent);
+
+// ————————— Tweakable defaults ——————————
+const TWEAKS = /*EDITMODE-BEGIN*/{
+  "theme": "terminal",
+  "variant": "editorial",
+  "accent": "rust"
+}/*EDITMODE-END*/;
+
+const ACCENTS = {
+  oxblood: { light: "#8a2c1b", soft: "#b86a54", dark: "#e08c70" },
+  forest:  { light: "#2f5d3f", soft: "#6a9a76", dark: "#7fc98f" },
+  ink:     { light: "#1e2a4a", soft: "#5b6ea0", dark: "#8aa4dd" },
+  rust:    { light: "#a64b1f", soft: "#d08560", dark: "#e8a27f" }
+};
+
+// ————————— Hero art: cellular dot field ——————————
+function CellDots() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width = 520 * devicePixelRatio;
+    const H = canvas.height = 520 * devicePixelRatio;
+    canvas.style.width = '520px'; canvas.style.height='520px';
+    const CX = W/2, CY = H/2;
+    const nodes = [];
+    const N = 140;
+    for (let i=0;i<N;i++){
+      const r = 60 + Math.random() * 180;
+      const a = Math.random() * Math.PI*2;
+      nodes.push({
+        x: CX + r * Math.cos(a) * devicePixelRatio,
+        y: CY + r * Math.sin(a) * devicePixelRatio,
+        vx: (Math.random()-0.5) * 0.25 * devicePixelRatio,
+        vy: (Math.random()-0.5) * 0.25 * devicePixelRatio,
+        r: (1.2 + Math.random()*3.2) * devicePixelRatio,
+        h: Math.random()
+      });
+    }
+    let raf;
+    const tick = () => {
+      ctx.clearRect(0,0,W,H);
+      const inkColor = getComputedStyle(document.body).getPropertyValue('--ink').trim();
+      const accentColor = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+      // connections
+      ctx.lineWidth = 0.5 * devicePixelRatio;
+      for (let i=0;i<nodes.length;i++){
+        for (let j=i+1;j<nodes.length;j++){
+          const a = nodes[i], b = nodes[j];
+          const dx = a.x-b.x, dy = a.y-b.y;
+          const d = Math.hypot(dx,dy);
+          if (d < 60 * devicePixelRatio){
+            const op = (1 - d/(60*devicePixelRatio)) * 0.18;
+            ctx.strokeStyle = `${inkColor}${Math.floor(op*255).toString(16).padStart(2,'0')}`;
+            ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+          }
+        }
+      }
+      // nodes
+      for (const n of nodes){
+        n.x += n.vx; n.y += n.vy;
+        const dx = n.x - CX, dy = n.y - CY;
+        const r = Math.hypot(dx,dy);
+        if (r > 230 * devicePixelRatio || r < 40*devicePixelRatio){ n.vx *= -1; n.vy *= -1; }
+        ctx.fillStyle = n.h < 0.18 ? accentColor : inkColor;
+        ctx.globalAlpha = n.h < 0.18 ? 0.7 : 0.35;
+        ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      raf = requestAnimationFrame(tick);
+    };
+    tick();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={ref} className="hero-art" aria-hidden="true" />;
+}
+
+// ————————— Topbar ——————————
+function TopBar({ onOpenCmdk, theme, setTheme, activeSec }) {
+  const links = [
+    ['about','About'],['publications','Publications'],['research','Research'],
+    ['projects','Projects'],['writing','Writing'],['contact','Contact']
+  ];
+  const cycle = () => {
+    const seq = ['paper','dark','terminal'];
+    setTheme(seq[(seq.indexOf(theme)+1) % seq.length]);
+  };
+  return (
+    <div className="topbar">
+      <div className="shell topbar-inner">
+        <div className="brand">
+          <span className="brand-dot" />
+          <span>Nigmat Rahim</span>
+          <small>Bioinformatics × AI</small>
+        </div>
+        <nav className="nav">
+          {links.map(([id, label]) => (
+            <a key={id} href={`#${id}`} className={activeSec===id?'active':''}>{label}</a>
+          ))}
+        </nav>
+        <div className="topbar-tools">
+          <button className="cmdk-btn" onClick={onOpenCmdk} aria-label="Open command palette">
+            <span style={{opacity:0.6}}>⌕</span>
+            <span className="lbl">Search</span>
+            <span className="k"><span className="kbd">⌘</span><span className="kbd">K</span></span>
+          </button>
+          <button className="icon-btn" onClick={cycle} aria-label="Toggle theme" title={`Theme: ${theme}`}>
+            {theme === 'paper' ? (
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+            ) : theme === 'dark' ? (
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            ) : (
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M7 9l3 3-3 3M12 15h5"/></svg>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ————————— Hero ——————————
+function Hero() {
+  return (
+    <section className="hero" id="top" style={{borderTop:'none'}}>
+      <div className="shell" style={{position:'relative',zIndex:2}}>
+        <div className="hero-meta">
+          <span className="rule" />
+          <span>Peking University · Institute of Medical Technology</span>
+          <span>·</span>
+          <span>Beijing, CN</span>
+        </div>
+        <h1>Reading cells<br/>with <em>code</em>.</h1>
+        <p className="hero-lede">
+          I'm <b>Nigmat Rahim</b> — an undergraduate researcher at Peking University Third Hospital, working at the seam of <b>single-cell genomics</b>, <b>agentic AI</b>, and <b>clinical decision-making</b>. I build retrieval-augmented systems that help pathologists see what slides can't say on their own.
+        </p>
+        <div className="hero-stats">
+          <div className="hero-stat">
+            <div className="num">4<span className="unit">papers</span></div>
+            <div className="lbl">co/first author</div>
+          </div>
+          <div className="hero-stat">
+            <div className="num">0.96<span className="unit">AUC</span></div>
+            <div className="lbl">ThyroPADA int. set</div>
+          </div>
+          <div className="hero-stat">
+            <div className="num">21<span className="unit">repos</span></div>
+            <div className="lbl">@Nigmat-future</div>
+          </div>
+          <div className="hero-stat">
+            <div className="num">Top 9%<span className="unit"></span></div>
+            <div className="lbl">Stanford RNA 3D · Kaggle</div>
+          </div>
+        </div>
+      </div>
+      <CellDots />
+    </section>
+  );
+}
+
+// ————————— About ——————————
+function About() {
+  return (
+    <section id="about">
+      <div className="shell">
+        <div className="sec-head">
+          <h2 className="sec-title"><span className="num">§ 01</span>About</h2>
+          <div className="sec-sub">Notes from a medical-technology undergrad, halfway between a microscope and a terminal.</div>
+        </div>
+        <div className="about-grid">
+          <div className="portrait">
+            <img src="assets/nigmat-portrait.jpg" alt="Nigmat Rahim" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'center top',filter:'saturate(0.92) contrast(1.02)'}} />
+            <div className="portrait-meta" style={{color:'#faf8f2', textShadow:'0 1px 4px rgba(0,0,0,0.5)', mixBlendMode:'normal'}}>
+              <span>Beijing, 2026</span>
+              <span>4:5</span>
+            </div>
+          </div>
+          <div className="about-body">
+            <p>
+              I came to bioinformatics through a side door. I was trained as a <b>medical technologist</b> — the person who stains the slide, calibrates the ELISA, runs the qPCR — and somewhere between a hematology rotation and a failed KEGG enrichment I realised the bottleneck had moved. The data was already there. Reading it wasn't.
+            </p>
+            <p>
+              Now I work with <b>Dr. Weilong Zhang</b> at Peking University Third Hospital, where we build AI agents that try to think like pathologists — not to replace them, but to show them the features they'd find if they had ten more minutes per slide. <b>ThyroPADA</b> is the one I'm proudest of: an agentic system that reads thyroid FNA whole-slide images and quantifies 16 cytopathological features on its own.
+            </p>
+            <p>
+              On weekends I maintain small open-source tools — a Python ↔ R bridge called <b>cellhop</b>, a scientific-colors library, an R-dependency solver. I speak <b>Uyghur</b> and <b>Mandarin</b> at home, English at work, and keep trying (poorly) to add French and German.
+            </p>
+            <div className="lang-strip">
+              <span><b>ug</b>Uyghur</span><span><b>zh</b>Mandarin</span><span><b>en</b>English · TOEFL 99</span><span><b>fr</b>French · basic</span><span><b>de</b>German · basic</span>
+            </div>
+            <div className="facts">
+              <div className="fact"><div className="k">Based in</div><div className="v">Beijing, China</div></div>
+              <div className="fact"><div className="k">Role</div><div className="v">B.S. Medical Technology<br/><em>Peking University · 2022–2026</em></div></div>
+              <div className="fact"><div className="k">Lab</div><div className="v">PKU Third Hospital<br/><em>Zhang Lab</em></div></div>
+              <div className="fact"><div className="k">Research</div><div className="v">scRNA-seq · RAG · agentic AI</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ————————— Publications ——————————
+function Authors({ list }) {
+  return (
+    <span className="pub-authors">
+      {list.map(([name, isMe, isCo], i) => (
+        <span key={i}>
+          <span className={isMe ? "me" : ""}>{name}</span>
+          {isCo && <span className="co">†</span>}
+          {i < list.length - 1 ? ", " : ""}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function PubRow({ p }) {
+  const [copied, setCopied] = useState(false);
+  const bibtex = useMemo(() => {
+    const key = `rahim${p.year}${p.id}`;
+    const authors = p.authors.map(a => a[0]).join(' and ').replace(/†/g,'');
+    return `@article{${key},\n  author = {${authors}},\n  title = {${p.title}},\n  journal = {${p.venue}},\n  year = {${p.year}},\n  note = {${p.status}}\n}`;
+  }, [p]);
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(bibtex); setCopied(true); setTimeout(()=>setCopied(false), 1400);} catch {}
+  };
+  const statusClass = p.status.toLowerCase().includes('review') ? 'review' : (p.status.toLowerCase().includes('accept') ? 'accepted' : '');
+  return (
+    <div className="pub" data-tags={p.tags.join(' ')}>
+      <div className="pub-year">
+        <span>{p.year}</span>
+        <span className={`st ${statusClass}`}>{p.status}</span>
+      </div>
+      <div>
+        <h3 className="pub-title">{p.title}</h3>
+        <Authors list={p.authors} />
+        <div className="pub-venue">
+          <em>{p.venue}</em>
+          <span>·</span>
+          <span>{p.note}</span>
+          {p.tags.map(t => <span key={t} style={{opacity:0.65}}>#{t}</span>)}
+        </div>
+      </div>
+      <div className="pub-actions">
+        <button className={copied ? 'copied' : ''} onClick={copy}>{copied ? '✓ Copied' : 'BibTeX'}</button>
+        <button onClick={() => alert('PDF coming soon — email nigmatrahim4@gmail.com for a preprint.')}>PDF</button>
+      </div>
+    </div>
+  );
+}
+
+function Publications() {
+  const TAGS = ['all','rag','single-cell','multi-omics','llm','immunology'];
+  const [active, setActive] = useState('all');
+  const filtered = active === 'all' ? DATA.publications : DATA.publications.filter(p => p.tags.includes(active));
+  return (
+    <section id="publications">
+      <div className="shell">
+        <div className="sec-head">
+          <h2 className="sec-title"><span className="num">§ 02</span>Publications</h2>
+          <div className="sec-sub">Peer-reviewed, co-first authorships marked with a † dagger. Click <span className="kbd">BibTeX</span> to copy a citation.</div>
+        </div>
+        <div className="pubs-head">
+          {TAGS.map(t => (
+            <button key={t} className={`chip ${active===t?'on':''}`} onClick={()=>setActive(t)}>
+              {t === 'all' ? 'All' : '#'+t}
+            </button>
+          ))}
+        </div>
+        <div>{filtered.map(p => <PubRow key={p.id} p={p} />)}</div>
+      </div>
+    </section>
+  );
+}
+
+// ————————— Research ——————————
+function Research() {
+  return (
+    <section id="research">
+      <div className="shell">
+        <div className="sec-head">
+          <h2 className="sec-title"><span className="num">§ 03</span>Research projects</h2>
+          <div className="sec-sub">Four studies I've led or co-led — spanning agentic AI, RAG, pan-cancer ML, and single-cell immunology.</div>
+        </div>
+        <div className="research-grid">
+          {DATA.research.map(r => (
+            <div key={r.code} className={`rp ${r.feature ? 'feature' : ''}`}>
+              <div className="rp-meta">
+                <span>{r.code}</span>
+                <span className="tag">{r.year}</span>
+              </div>
+              <h3>{r.title}</h3>
+              <p>{r.blurb}</p>
+              {r.stats && (
+                <div className="rp-stats">
+                  {r.stats.map((s, i) => (
+                    <div key={i} className="rp-stat">
+                      <div className="n">{s[0]}{s[1] && <span className="u">{s[1]}</span>}</div>
+                      <div className="l">{s[2]}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {r.tech && (
+                <div className="rp-tech">
+                  {r.tech.map(t => <span key={t}>{t}</span>)}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ————————— OSS / Projects ——————————
+function Projects() {
+  return (
+    <section id="projects">
+      <div className="shell">
+        <div className="sec-head">
+          <h2 className="sec-title"><span className="num">§ 04</span>Open source</h2>
+          <div className="sec-sub">A selection of repos from <a href="https://github.com/Nigmat-future" target="_blank" rel="noopener" style={{borderBottom:'1px solid var(--rule)'}}>github.com/Nigmat-future</a>. Mostly bioinformatics pipelines and small developer tools for scientists.</div>
+        </div>
+        <div className="oss-grid">
+          {DATA.oss.map(o => (
+            <a key={o.name} className="oss" href={o.url} target="_blank" rel="noopener">
+              <div className="oss-top">
+                <span><span className="dot" style={{background:o.color}}/>{o.lang}</span>
+                <span>public</span>
+              </div>
+              <h4 className="oss-name">{o.name}</h4>
+              <p className="oss-desc">{o.desc}</p>
+              <span className="oss-arr">↗</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ————————— Writing ——————————
+function Writing() {
+  return (
+    <section id="writing">
+      <div className="shell">
+        <div className="sec-head">
+          <h2 className="sec-title"><span className="num">§ 05</span>Writing</h2>
+          <div className="sec-sub">Essays, notes, and the occasional post-mortem. Roughly once a month.</div>
+        </div>
+        <div className="posts">
+          {DATA.posts.map((p, i) => (
+            <a key={i} className="post" href="#">
+              <div className="post-date">{p.date}</div>
+              <h3 className="post-title" dangerouslySetInnerHTML={{__html:p.title}} />
+              <div className="post-tag">{p.tag}<br/><span style={{opacity:0.6}}>{p.read}</span></div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ————————— Contact ——————————
+function Contact() {
+  return (
+    <section id="contact">
+      <div className="shell">
+        <div className="sec-head">
+          <h2 className="sec-title"><span className="num">§ 06</span>Now & contact</h2>
+          <div className="sec-sub">What I'm working on this season, and how to reach me.</div>
+        </div>
+        <div className="now-contact">
+          <div>
+            <div style={{fontFamily:'var(--mono)',fontSize:'11px',color:'var(--ink-mute)',letterSpacing:'0.1em',textTransform:'uppercase'}}>now · spring 2026</div>
+            <div className="now-list">
+              <div className="now-item"><span className="b"/><div>Finishing my <b>undergraduate thesis</b> on ThyroPADA — validating across two more external cohorts and writing up the multi-reader comparison.</div></div>
+              <div className="now-item"><span className="b"/><div>Reading about <b>protein language models</b> and wondering whether RAG over structural embeddings beats pure fine-tuning for rare-disease variant calling.</div></div>
+              <div className="now-item"><span className="b"/><div>Applying to <b>PhD programs</b> starting Fall 2026 — bioinformatics / computational biology, with a preference for labs that touch clinical data.</div></div>
+              <div className="now-item"><span className="b"/><div>Maintaining <b>cellhop</b> (AnnData↔Seurat) in response to occasional issues from grateful strangers.</div></div>
+            </div>
+          </div>
+          <div className="contact-card">
+            <h4>Get in touch</h4>
+            <p style={{fontSize:15, color:'var(--ink-soft)', margin:'0 0 4px', lineHeight:1.55}}>Happy to talk about RAG in clinical settings, single-cell pipelines, or PhD applications. I read everything.</p>
+            <div className="contact-list">
+              <div className="contact-row"><span className="k">email</span><a href="mailto:nigmatrahim4@gmail.com">nigmatrahim4@gmail.com</a></div>
+              <div className="contact-row"><span className="k">github</span><a href="https://github.com/Nigmat-future" target="_blank" rel="noopener">@Nigmat-future</a></div>
+              <div className="contact-row"><span className="k">researchgate</span><a href="#" target="_blank" rel="noopener">Nigmat Rahim</a></div>
+              <div className="contact-row"><span className="k">cv</span><a href="#" download>Nigmat_Rahim_CV.pdf ↓</a></div>
+              <div className="contact-row"><span className="k">phone</span><a href="tel:+8613521755312">+86 135 2175 5312</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer(){
+  return (
+    <footer>
+      <div className="shell foot">
+        <span>© 2026 Nigmat Rahim — built with type, science, and a terminal.</span>
+        <span>colophon · Fraunces + Newsreader + JetBrains Mono</span>
+      </div>
+    </footer>
+  );
+}
+
+// ————————— Command palette ——————————
+function CmdK({ open, onClose }) {
+  const [q, setQ] = useState('');
+  const [sel, setSel] = useState(0);
+  const items = useMemo(() => {
+    const all = [
+      { k:'Jump', t:'Home / top', to:'#top' },
+      { k:'Jump', t:'About', to:'#about' },
+      { k:'Jump', t:'Publications', to:'#publications' },
+      { k:'Jump', t:'Research projects', to:'#research' },
+      { k:'Jump', t:'Open source', to:'#projects' },
+      { k:'Jump', t:'Writing', to:'#writing' },
+      { k:'Jump', t:'Contact', to:'#contact' },
+      ...DATA.publications.map(p => ({ k:'Paper', t:p.title, to:'#publications' })),
+      ...DATA.oss.map(o => ({ k:'Repo', t:o.name + ' — ' + o.desc.slice(0,60), to:o.url, ext:true })),
+      ...DATA.posts.map(p => ({ k:'Post', t:p.title.replace(/<[^>]+>/g,''), to:'#writing' })),
+      { k:'Link', t:'Email Nigmat', to:'mailto:nigmatrahim4@gmail.com', ext:true },
+      { k:'Link', t:'GitHub profile', to:'https://github.com/Nigmat-future', ext:true },
+    ];
+    const qq = q.toLowerCase().trim();
+    if (!qq) return all.slice(0,10);
+    return all.filter(i => (i.t + ' ' + i.k).toLowerCase().includes(qq)).slice(0,12);
+  }, [q]);
+  useEffect(() => { setSel(0); }, [q, open]);
+  useEffect(() => {
+    if (!open) return;
+    const h = (e) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowDown'){ e.preventDefault(); setSel(s => Math.min(items.length-1, s+1));}
+      if (e.key === 'ArrowUp'){ e.preventDefault(); setSel(s => Math.max(0, s-1));}
+      if (e.key === 'Enter'){
+        const it = items[sel]; if (!it) return;
+        if (it.ext){ window.open(it.to,'_blank'); } else { location.hash = it.to; }
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [open, items, sel, onClose]);
+  if (!open) return null;
+  return (
+    <div className="cmdk-overlay" onClick={onClose}>
+      <div className="cmdk" onClick={e=>e.stopPropagation()}>
+        <input autoFocus placeholder="Search papers, repos, posts, pages…" value={q} onChange={e=>setQ(e.target.value)} />
+        <div className="cmdk-list">
+          {items.length === 0 && <div style={{padding:'30px', textAlign:'center', fontFamily:'var(--serif)', fontStyle:'italic', color:'var(--ink-mute)'}}>No matches. Try "rag", "cellhop", or "kegg".</div>}
+          {items.map((it, i) => (
+            <div key={i} className={`cmdk-row ${i===sel?'on':''}`} onMouseEnter={()=>setSel(i)} onClick={()=>{
+              if (it.ext) window.open(it.to,'_blank'); else location.hash = it.to; onClose();
+            }}>
+              <span className="ic">{it.k[0]}</span>
+              <span>{it.t}</span>
+              <span className="tag">{it.k}{it.ext ? ' ↗' : ''}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ————————— Tweaks panel ——————————
+function Tweaks({ open, onClose, theme, setTheme, accent, setAccent }) {
+  if (!open) return null;
+  return (
+    <div className="tweaks">
+      <div className="tweaks-h">
+        <span>Tweaks</span>
+        <button className="tweaks-close" onClick={onClose} aria-label="Close">×</button>
+      </div>
+      <div className="tweaks-b">
+        <div className="tweaks-row">
+          <label>Theme</label>
+          <div className="tweaks-seg">
+            {['paper','dark','terminal'].map(t => (
+              <button key={t} className={theme===t?'on':''} onClick={()=>setTheme(t)}>{t}</button>
+            ))}
+          </div>
+        </div>
+        <div className="tweaks-row">
+          <label>Accent</label>
+          <div className="tweaks-seg">
+            {Object.keys(ACCENTS).map(a => (
+              <button key={a} className={accent===a?'on':''} onClick={()=>setAccent(a)}
+                style={{borderLeft:accent===a?`2px solid ${ACCENTS[a].light}`:''}}>
+                {a}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div style={{fontFamily:'var(--serif)',fontSize:12,color:'var(--ink-mute)',fontStyle:'italic',marginTop:6,lineHeight:1.5}}>
+          Themes and accents persist via the Tweaks toggle in the toolbar.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ————————— App ——————————
+function App() {
+  const [theme, setTheme] = useState(TWEAKS.theme === 'paper' ? 'paper' : TWEAKS.theme);
+  const [accent, setAccent] = useState(TWEAKS.accent);
+  const [cmdkOpen, setCmdkOpen] = useState(false);
+  const [tweaksOpen, setTweaksOpen] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [activeSec, setActiveSec] = useState('top');
+
+  // apply theme
+  useEffect(() => {
+    if (theme === 'paper') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  // apply accent
+  useEffect(() => {
+    const a = ACCENTS[accent] || ACCENTS.oxblood;
+    const isDark = theme !== 'paper';
+    document.documentElement.style.setProperty('--accent', isDark ? a.dark : a.light);
+    document.documentElement.style.setProperty('--accent-soft', a.soft);
+  }, [accent, theme]);
+
+  // cmd-k
+  useEffect(() => {
+    const h = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); setCmdkOpen(o=>!o); }
+      if (e.key === '/' && !cmdkOpen && document.activeElement.tagName !== 'INPUT'){ e.preventDefault(); setCmdkOpen(true); }
+    };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [cmdkOpen]);
+
+  // scroll progress + active section
+  useEffect(() => {
+    const h = () => {
+      const s = document.documentElement.scrollTop;
+      const max = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      setProgress(max > 0 ? Math.min(100, (s/max)*100) : 0);
+      const ids = ['about','publications','research','projects','writing','contact'];
+      const y = s + 140;
+      let cur = 'top';
+      for (const id of ids){
+        const el = document.getElementById(id);
+        if (el && el.offsetTop <= y) cur = id;
+      }
+      setActiveSec(cur);
+    };
+    window.addEventListener('scroll', h, { passive: true });
+    h();
+    return () => window.removeEventListener('scroll', h);
+  }, []);
+
+  // tweaks host protocol
+  useEffect(() => {
+    const h = (e) => {
+      if (!e.data || typeof e.data !== 'object') return;
+      if (e.data.type === '__activate_edit_mode') setTweaksOpen(true);
+      if (e.data.type === '__deactivate_edit_mode') setTweaksOpen(false);
+    };
+    window.addEventListener('message', h);
+    try { window.parent.postMessage({ type:'__edit_mode_available' }, '*'); } catch {}
+    return () => window.removeEventListener('message', h);
+  }, []);
+
+  // persist
+  useEffect(() => {
+    try { window.parent.postMessage({type:'__edit_mode_set_keys', edits:{ theme, accent }}, '*'); } catch {}
+  }, [theme, accent]);
+
+  return (
+    <>
+      <div className="progress" style={{width: progress + '%'}} />
+      <TopBar onOpenCmdk={() => setCmdkOpen(true)} theme={theme} setTheme={setTheme} activeSec={activeSec} />
+      <Hero />
+      <About />
+      <Publications />
+      <Research />
+      <Projects />
+      <Writing />
+      <Contact />
+      <Footer />
+      <CmdK open={cmdkOpen} onClose={() => setCmdkOpen(false)} />
+      <Tweaks open={tweaksOpen} onClose={() => setTweaksOpen(false)} theme={theme} setTheme={setTheme} accent={accent} setAccent={setAccent} />
+    </>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('app'));
+root.render(<App />);
+</script>
+
+</body>
+</html>
